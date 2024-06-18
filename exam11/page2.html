@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>        
+    <script>
+         $(function (){
+            $('head').load('head.html')
+            $('#header').load('header.html')
+            
+         })
+        </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 2</title>
+    
+    
+</head>
+<body onload="click_load_data()">
+    <div id="header"></div>  
+    <div class="col-5 mx-auto bg-light p-3 mt-5 border">
+        <button type="button" class="btn btn-success mb-3"id = "add_new_data" onclick="click_add_new_data()">Add new data</button>
+        <table class="table border border-dark table-hover table-striped " id = "tb1">
+            <thead>
+              <tr>
+                <th scope="col">SID</th>
+                <th scope="col">Sname</th>
+                <th scope="col">Phone</th>
+             
+              </tr>
+            <tbody>
+                
+            </tbody>
+          </table>
+      </div>
+    <script>
+
+        let tb1 = document.getElementById('tb1').getElementsByTagName('tbody')[0]
+        let row
+        let sid = []
+        let sname = []
+        let phone = []
+
+        if(sessionStorage.getItem('user') == null){
+            alert('กรุณาล็อกอิน')
+            location.href = 'login.html'
+        }
+        
+            function click_add_new_data(){
+                row = tb1.insertRow()
+                row.insertCell().innerHTML = '<input type="text" class="form-control" id="sid" placeholder="Input Student ID">'
+                row.insertCell().innerHTML = '<input type="text" class="form-control" id="sname" placeholder="Input Full Name">'
+                row.insertCell().innerHTML = '<input type="text" class="form-control" id="phone" placeholder="Input Phone Number">'
+                row.insertCell().innerHTML = '<button type="button" class="btn btn-success mb-3" onclick="click_save_data()">Save</button> <button type="button" class=" btn btn-success mb-3" onclick="click_cancel()">Cancel</button>'
+                document.getElementById('add_new_data').disabled = true
+                for (let j = 0; j < tb1.rows.length - 1; j++) {
+                tb1.rows[j].cells[3].querySelector('button').disabled = true;
+                tb1.rows[j].cells[4].querySelector('button').disabled = true;
+            }
+            
+        }
+        function click_save_data(){
+             sid.push(document.getElementById('sid').value)
+             sname.push(document.getElementById('sname').value)
+             phone.push(document.getElementById('phone').value)
+
+
+            localStorage.setItem('sid',JSON.stringify(sid))
+            localStorage.setItem('sname', JSON.stringify(sname))
+            localStorage.setItem('phone',JSON.stringify(phone))
+
+              click_load_data()
+              document.getElementById('add_new_data').disabled = false
+        }
+            function click_load_data(){
+               try {
+                sid = JSON.parse(localStorage.getItem('sid'))
+                sname = JSON.parse(localStorage.getItem('sname'))
+                phone = JSON.parse(localStorage.getItem('phone'))
+                tb1.innerHTML = ''
+                for (let i = 0 ; i < sid.length; i ++)
+                {
+                    row = tb1.insertRow()
+                    row.insertCell().innerHTML = sid[i]
+                    row.insertCell().innerHTML = sname[i]
+                    row.insertCell().innerHTML = phone[i]
+                    row.insertCell().innerHTML = '<button type="button" class="btns btn btn-primary mb-3" onclick="click_edit_data(' + i + ')">Edit</button>' 
+                    row.insertCell().innerHTML = '<button type="button" class="btns btn btn-danger mb-3" onclick="click_delete_data(' + i + ')">Delete</button>';
+                }
+            }catch(error){
+                    if(sid == null){
+                         sid = []
+                         sname = []
+                         phone = []
+                    localStorage.setItem('sid',JSON.stringify(sid))
+                    localStorage.setItem('sname',JSON.stringify(sname))
+                    localStorage.setItem('phone',JSON.stringify(phone))
+
+                    }
+            }
+        }
+            function click_cancel(){
+                    tb1.deleteRow(tb1.rows.length - 1)
+                    document.getElementById('add_new_data').disabled = false
+                    document.getElementById('click_edit_data').disabled = false
+                  document.getElementById('click_delete_data').disabled = false
+
+                    
+
+
+            }
+                function click_delete_data(i)
+                {
+                    // delete sid[i]
+                    // delete sname[i]
+                    // delete phone[i]
+                    if (confirm('ต้องการลบใช่หรือไม่'))
+                    {
+                        sid.splice(i, 1)
+                    sname.splice(i,1)
+                    phone.splice(i,1) 
+
+                    localStorage.setItem('sid',JSON.stringify(sid))
+                    localStorage.setItem('sname',JSON.stringify(sname))
+                    localStorage.setItem('phone',JSON.stringify(phone))
+
+                    click_load_data()
+
+                    }
+            }
+            function click_edit_data(i) {
+            tb1.rows[i].cells[0].innerHTML = '<input type="text" class="form-control" id="edit_sid" value="' + sid[i] + '"></input>';
+            tb1.rows[i].cells[1].innerHTML = '<input type="text" class="form-control" id="edit_sname" value="' + sname[i] + '"></input>';
+            tb1.rows[i].cells[2].innerHTML = '<input type="text" class="form-control" id="edit_phone" value="' + phone[i] + '"></input>';
+            tb1.rows[i].cells[3].innerHTML = '<button type="button" class="btn btn-success mb-3" onclick="click_save_edit(' + i + ')">SAVE</button>';
+            tb1.rows[i].cells[4].innerHTML = '<button type="button" class="btn btn-danger mb-3" onclick="click_cancel_edit( ' + i + ')">CANCEL</button>';
+
+            document.getElementById('add_new_data').disabled = true
+
+            let tableButtons = document.querySelectorAll('.btns')
+            for (let i = 0; i < tableButtons.length; i ++){
+                tableButtons[i].disabled = true
+            }
+        }
+
+        function click_save_edit(i) {
+            sid[i] = document.getElementById('edit_sid').value;
+            sname[i] = document.getElementById('edit_sname').value;
+            phone[i] = document.getElementById('edit_phone').value;
+
+            localStorage.setItem('sid', JSON.stringify(sid));
+            localStorage.setItem('sname', JSON.stringify(sname));
+            localStorage.setItem('phone', JSON.stringify(phone));
+
+            click_load_data();
+        }
+
+        function click_cancel_edit() {
+            click_load_data()
+            document.getElementById('add_new_data').disabled = false
+        }
+    </script>
+   
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    
+
+</body>
+</html>
